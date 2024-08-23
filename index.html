@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetflixApp</title>
+    <style>
+        body {
+          font-family: 'Roboto', sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: #141414;
+          color: #ffffff;
+        }
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .header {
+          background-color: #000000;
+          padding: 20px 0;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+        }
+        .header-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 20px;
+        }
+        .logo {
+          font-size: 24px;
+          font-weight: bold;
+          color: #e50914;
+        }
+        .search-bar {
+          display: flex;
+          align-items: center;
+        }
+        .search-input {
+          padding: 10px;
+          border: none;
+          border-radius: 4px 0 0 4px;
+          width: 300px;
+        }
+        .search-button {
+          background-color: #e50914;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 0 4px 4px 0;
+          cursor: pointer;
+        }
+        .categories {
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+          margin-top: 20px;
+          flex-wrap: wrap;
+        }
+        .category-button {
+          background-color: #333;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 20px;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+        }
+        .category-button:hover, .category-button.active {
+          background-color: #e50914;
+        }
+        .movie-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 20px;
+          margin-top: 20px;
+        }
+        .movie-card {
+          background-color: #2f2f2f;
+          border-radius: 8px;
+          overflow: hidden;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          cursor: pointer;
+        }
+        .movie-card:hover {
+          transform: scale(1.05);
+          box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        .movie-poster {
+          width: 100%;
+          height: 300px;
+          object-fit: cover;
+        }
+        .movie-info {
+          padding: 15px;
+        }
+        .movie-title {
+          font-size: 16px;
+          font-weight: bold;
+          margin-bottom: 5px;
+        }
+        .movie-rating {
+          color: #ffd700;
+          font-weight: bold;
+          display: flex;
+          align-items: center;
+        }
+        .star-icon {
+          width: 16px;
+          height: 16px;
+          margin-right: 5px;
+        }
+        .modal {
+          display: none;
+          position: fixed;
+          z-index: 1000;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          overflow: auto;
+          background-color: rgba(0,0,0,0.9);
+        }
+        .modal-content {
+          background-color: #181818;
+          margin: 5% auto;
+          padding: 20px;
+          border-radius: 8px;
+          max-width: 800px;
+          width: 90%;
+        }
+        .close {
+          color: #aaa;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+          cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+          color: #fff;
+          text-decoration: none;
+          cursor: pointer;
+        }
+        .video-container {
+          position: relative;
+          padding-bottom: 56.25%;
+          height: 0;
+          overflow: hidden;
+        }
+        .video-container iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
+        .movie-details {
+          margin-top: 20px;
+        }
+        .movie-details h2 {
+          margin-bottom: 10px;
+        }
+        .movie-details p {
+          margin-bottom: 5px;
+        }
+      </style>
+</head>
+<body>
+    <header class= "header">
+    <div class="header-content">
+          <!--logo-->
+    <div class="logo">
+        <img src="https://www.aldavr.com/assets/img/logo/logo-top.png" alt="">
+    </div>
+     <!--search-->
+    <div class="search-bar">
+        <input type="text" class="search-input" placeholder="Qidirish...">
+        <button class="search-button">search</button>
+    </div>
+</div>
+    </header>
+
+    <!--cotegory-->
+    <div class="container">
+        <div class="categories"  id="='categories">
+            <Button class="category-button active" data-category="popular">Popular</Button>
+            <Button class="category-button" data-category="top_Rated">Top Rated</Button>
+            <Button class="category-button" data-category="Upcoming">Upcoming</Button>
+            <Button class="category-button" data-category="now_Playing">Now Playing</Button>
+        </div>
+        <div id="movie-grid" id="movie-grid"></div>
+        <div class="movie-grid" id="movieGrid"><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/pjnD08FlMAIXsfOLKQbvmO0f0MD.jpg" alt="Twisters poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">Twisters</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                7.1
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg" alt="Deadpool &amp; Wolverine poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">Deadpool &amp; Wolverine</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                7.8
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg" alt="Inside Out 2 poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">Inside Out 2</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                7.6
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/wWba3TaojhK7NdycRhoQpsG0FaH.jpg" alt="Despicable Me 4 poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">Despicable Me 4</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                7.3
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/oGythE98MYleE6mZlGs5oBGkux1.jpg" alt="Bad Boys: Ride or Die poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">Bad Boys: Ride or Die</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                7.6
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/m2zXTuNPkywdYLyWlVyJZW2QOJH.jpg" alt="Kill poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">Kill</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                7.0
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/ggZGnJLzO3BTu7ysuuIzou3Oex5.jpg" alt="Dragonkeeper poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">Dragonkeeper</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                7.2
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/AjV6jFJ2YFIluYo4GQf13AA1tqu.jpg" alt="It Ends with Us poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">It Ends with Us</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                7.1
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/hU42CRk14JuPEdqZG3AWmagiPAP.jpg" alt="A Quiet Place: Day One poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">A Quiet Place: Day One</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                6.9
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/5wAlO5zZ3IyzLBAf7cp5WejalmG.jpg" alt="Prey poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">Prey</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                6.5
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/b33nnKl1GSFbao4l3fZDDqsMx0F.jpg" alt="Alien: Romulus poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">Alien: Romulus</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                7.3
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/30YnfZdMNIV7noWLdvmcJS0cbnQ.jpg" alt="Saving Bikini Bottom: The Sandy Cheeks Movie poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">Saving Bikini Bottom: The Sandy Cheeks Movie</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                6.4
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/u9035lysUz3ccloQt0SeIp1Mu8a.jpg" alt="Mayhem! poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">Mayhem!</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                6.7
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/hdBUjfbdr1ymS0kycAT7qguOmWA.jpg" alt="One Fast Move poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">One Fast Move</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                6.8
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/thI9pM7Qu43f42sOOl5wy75UAo.jpg" alt="The Instigators poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">The Instigators</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                6.4
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/iADOJ8Zymht2JPMoy3R7xceZprc.jpg" alt="Furiosa: A Mad Max Saga poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">Furiosa: A Mad Max Saga</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                7.6
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/gKkl37BQuKTanygYQG1pyYgLVgf.jpg" alt="Kingdom of the Planet of the Apes poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">Kingdom of the Planet of the Apes</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                7.2
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/xYduFGuch9OwbCOEUiamml18ZoB.jpg" alt="The Garfield Movie poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">The Garfield Movie</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                7.2
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/e5ZqqPlhKstzB4geibpZh38w7Pq.jpg" alt="The Convert poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">The Convert</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                6.3
+              </div>
+            </div>
+          </div><div class="movie-card">
+            <img src="https://image.tmdb.org/t/p/w500/koJFEW997sLjpu4e7wmFioA2mhL.jpg" alt="Paradox Effect poster" class="movie-poster">
+            <div class="movie-info">
+              <div class="movie-title">Paradox Effect</div>
+              <div class="movie-rating">
+                <svg class="star-icon" viewBox="0 0 24 24">
+                  <path fill="#ffd700" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
+                </svg>
+                6.4
+              </div>
+            </div>
+          </div></div>
+    </div>
+
+    <!--modal-->
+    <div id="movieModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="video-container">
+                <iframe id="movieTrailer" src="" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="movie-details" id="movieDetails"></div>
+        </div>
+    </div>
+
+    <!--scripts-->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./js/main.js"></script>
+
+
+</body>
+</html>
